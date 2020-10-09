@@ -1,0 +1,74 @@
+@page
+@model TestPond.Web.Pages.TestFailureModel
+@{
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>TestFailure</title>
+</head>
+<body>
+
+    <h1>@Model.MobileAppBuild.BuildDefinitionName - @Model.MobileAppBuild.BuildNumber - @Model.MobileAppBuild.BuildDate </h1>
+    <p>Mobile Build</p>
+
+    <h2>@Model.TestExecution.TestCaseId</h2>
+    <p>Test Case</p>
+
+    <h2>@Model.TestExecution.SingleDeviceTestSuiteRun.MobileDevice.Name</h2>
+    <p>Mobile Device</p>
+
+    <h3>@Model.TestExecution.FailureMessage</h3>
+    <p>Failure Message</p>
+
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+
+        <li class="nav-item">
+            <a class="nav-link active" id="pills-screenshot-tab" data-toggle="pill" href="#pills-screenshot" role="tab" aria-controls="pills-screenshot" aria-selected="true">Screenshot</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" id="pills-stack-trace-tab" data-toggle="pill" href="#pills-stack-trace" role="tab" aria-controls="pills-stack-trace" aria-selected="false">Stack Trace</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" id="pills-console-tab" data-toggle="pill" href="#pills-console" role="tab" aria-controls="pills-console" aria-selected="false">Console Output</a>
+        </li>
+
+
+
+        <li class="nav-item">
+            <a class="nav-link" id="pills-nunit-tab" data-toggle="pill" href="#pills-nunit" role="tab" aria-controls="pills-nunit" aria-selected="false">NUnit XML</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="pills-tabContent">
+
+
+        <div style="vertical-align: top;" class="tab-pane show active" id="pills-screenshot" role="tabpanel" aria-labelledby="pills-screenshot-tab">
+            <img class="failScreenshot" src="@Model.FailScreenshot" />
+        </div>
+
+        <div class="tab-pane fade fade" id="pills-stack-trace" role="tabpanel" aria-labelledby="pills-stack-trace-tab">
+            @*<textarea style="height:400px;" contentEditable>@Model.TestExecution.FailureStackTrace</textarea>*@
+            @Html.Raw(@Model.FormattedStackTrace)
+        </div>
+
+        <div class="tab-pane fade" id="pills-console" role="tabpanel" aria-labelledby="pills-console-tab">
+            <textarea style="height:1200px;" contentEditable>@Model.TestExecution.ConsoleOutput</textarea>
+        </div>
+
+
+        <div class="tab-pane fade" id="pills-nunit" role="tabpanel" aria-labelledby="pills-nunit-tab">
+            <textarea style="height:1200px;" contentEditable>@Model.TestExecution.SingleDeviceTestSuiteRun.TestRunReportRaw</textarea>
+        </div>
+    </div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+</body>
+</html>

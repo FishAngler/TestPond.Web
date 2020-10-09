@@ -1,0 +1,58 @@
+@page
+@model TestPond.Web.Pages.SingleDeviceRunModel
+@{
+    ViewData["Title"] = "Test Case Summary";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>DeviceRunTestCaseSummary</title>
+
+</head>
+<body>
+
+    <div class="row">
+        <div class="col-sm">
+
+            <h1> @Model.CollectionRun.MobileAppBuild.BuildDefinitionId - @Model.CollectionRun.MobileAppBuild.BuildDefinitionName - @Model.CollectionRun.MobileAppBuild.BuildNumber | @Model.CollectionRun.MobileAppBuild.BuildDate</h1>
+            <p>Target Build</p>
+
+            <h2 style="color:gray;">@Model.CollectionRun.Date</h2>
+            <p>Run Date</p>
+
+            <h3 style="color:gray;">@Model.CollectionRun.TestSelectionQuery</h3>
+            <p>NUnit Filter</p>
+
+            <h3 style="color:gray;">@Model.MobileDevice.Name</h3>
+            <p>MobileDevice</p>
+
+            <a href="#">NUnit XML</a>
+
+            @foreach (var testExec in @Model.TestCaseExecutions)
+            {
+                <div class="card" style="margin-bottom:15px;">
+                    <div class="card-header"><h5>@testExec.TestCase.Id</h5></div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li>
+                                <a style="text-decoration:none;" asp-area="" asp-page="/TestFailure" asp-route-id=@testExec.Id>
+                                    <span class="@(testExec.Result == BusinessLayer.Models.TestResult.Passed ? "badge badge-success" : "badge badge-danger")">@testExec.Result</span>
+                                </a>
+                                <br />
+                                <p style="color:gray; margin-bottom: 5px;">@(!string.IsNullOrWhiteSpace(testExec.FailureMessage) ? testExec.FailureMessage : "(No failure message)")</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+</body>
+</html>

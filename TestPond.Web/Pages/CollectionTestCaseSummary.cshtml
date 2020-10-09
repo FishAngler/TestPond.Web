@@ -1,0 +1,73 @@
+@page
+@model TestPond.Web.Pages.DeviceRunTestCaseSummaryModel
+@{ ViewData["Title"] = "Test Case Summary"; }
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>DeviceRunTestCaseSummary</title>
+
+</head>
+<body>
+
+    <div class="row" style="border: 2px solid purple">
+        <div class="col-sm" style="border: 2px solid blue">
+
+            <h1> @Model.CollectionRun.MobileAppBuild.BuildDefinitionId - @Model.CollectionRun.MobileAppBuild.BuildDefinitionName - @Model.CollectionRun.MobileAppBuild.BuildNumber | @Model.CollectionRun.MobileAppBuild.BuildDate</h1>
+            <p>Target Build</p>
+
+            <h2 style="color:gray;">@Model.CollectionRun.Date</h2>
+            <p>Run Date</p>
+
+            <h3 style="color:gray;">@Model.CollectionRun.TestSelectionQuery</h3>
+            <p>NUnit Filter</p>
+
+            @*Class Group -> Test Case -> Execution Result*@
+            @foreach (var classGroup in Model.TestCaseExecutionsGroupedByClassName)
+            {
+        <div style="border:1px solid gray; margin-bottom: 30px;">
+            <h1>@classGroup.Key</h1>
+
+            @foreach (var testCase in classGroup)
+            {
+        <div class="card" style="margin-bottom:15px; border:1px solid gray;">
+            <div class="card-header"><h5>@testCase.Id</h5></div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    @foreach (var tcExec in testCase.TestCaseRuns)
+                    {
+
+                                @if (tcExec.Result == BusinessLayer.Models.TestResult.Passed)
+                                {
+                                <li class="list-group-item">
+                                    <span class="badge badge-success">@tcExec.Result</span> @tcExec.SingleDeviceTestSuiteRun.MobileDevice.Name
+                                </li>
+                                }
+
+                                @if (tcExec.Result == BusinessLayer.Models.TestResult.Failed)
+                                {
+                                <a style="text-decoration:none;" asp-area="" asp-page="/TestFailure" asp-route-id=@tcExec.Id>
+                                    <li class="list-group-item list-group-item-action">
+                                        <span class="badge badge-danger">@tcExec.Result</span> @tcExec.SingleDeviceTestSuiteRun.MobileDevice.Name
+                                        <br />
+                                        <p style="color:gray; margin-bottom: 5px;">@(!string.IsNullOrWhiteSpace(tcExec.FailureMessage) ? tcExec.FailureMessage : "(No failure message)")</p>
+                                    </li>
+                                </a>
+                                }
+                     }
+                </ul>
+            </div>
+        </div>
+            }
+        </div>
+        }
+        </div>
+    </div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
+</body>
+</html>

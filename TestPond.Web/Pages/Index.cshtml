@@ -1,0 +1,43 @@
+@page
+@model IndexRowModel
+@{ ViewData["Title"] = "Collection Run Summary"; }
+
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Run Date</th>
+            <th scope="col">Build Definition</th>
+            <th scope="col">Build Number</th>
+            <th scope="col">Test Selection</th>
+            <th scope="col">Devices</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var collectionRun in Model.collectionRuns)
+        {
+
+        <tr onclick="window.location='/CollectionTestCaseSummary2?Id=@collectionRun.Id'">
+            <td>@collectionRun.Date.ToLocalTime().ToShortDateString()<br />@collectionRun.Date.ToLocalTime().ToShortTimeString()</td>
+            <th scope="row">@collectionRun.MobileAppBuild.BuildDefinitionName</th>
+            <td>@collectionRun.MobileAppBuild.BuildNumber<br />@collectionRun.MobileAppBuild.BuildDate</td>
+            <td>@collectionRun.TestSelectionQuery</td>
+            @*<td>@collectionRun.Filter.ToString()</td>*@
+
+            <td>
+                @foreach (var singleRun in collectionRun.SingleDeviceTestSuiteRuns)
+                {
+        <a style="text-decoration:none;" asp-area="" asp-page="/SingleDeviceRun" asp-route-id=@singleRun.Id>
+            <h4 style="display:inline-block;"><span class="badge badge-dark">@singleRun.MobileDevice.Name</span"></h4>
+        </a>}
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

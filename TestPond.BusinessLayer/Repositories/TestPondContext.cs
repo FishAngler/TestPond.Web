@@ -28,7 +28,8 @@ namespace TestPond.BusinessLayer.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Filename=TestPond.db");
+            //TODO:Remove this
+            //optionsBuilder.UseSqlite("Filename=TestPond.db");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -41,6 +42,7 @@ namespace TestPond.BusinessLayer.Models
     public class MobileBuild 
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
         public Platform Platform { get; set; }
         public BuildEnvironment Environment { get; set; }

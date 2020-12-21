@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,18 +30,13 @@ namespace TestPond.Web
         public void ConfigureServices(IServiceCollection services)
         {
             /////// DATA
+            string connStr = Configuration["ConnectionStrings:Default"];
+
             // DBContext
-            //services.AddDbContext<TestPondContext>(options => options.UseInMemoryDatabase("TestPondDb")
-            //.EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Singleton);
-
-            //services.AddEntityFrameworkSqlite().AddDbContext<TestPondContext>(options =>
-            //options.EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Singleton);
-
-            services.AddEntityFrameworkSqlite().AddDbContext<TestPondContext>(options =>
-            options.EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Scoped);
+            services.AddDbContext<TestPondContext>(options => options.UseSqlServer(connStr)
+            .EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Scoped);
 
             // Repository
-            //services.AddSingleton<TestPondRepository>();
             services.AddScoped<TestPondRepository>();
 
             services.AddAutoMapper(typeof(Startup));
@@ -63,7 +59,6 @@ namespace TestPond.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
             var cultureInfo = new CultureInfo("en-US");
 
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
@@ -92,6 +87,21 @@ namespace TestPond.Web
                 endpoints.MapControllers();
                 endpoints.MapRazorPages();
             });
+        }
+
+        public void ConfigureWithSqlLite()
+        {
+            //In-Memory SQLite
+            //services.AddDbContext<TestPondContext>(options => options.UseInMemoryDatabase("TestPondDb")
+            //.EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Singleton);
+
+            //Physical SQLite File - Singleton
+            //services.AddEntityFrameworkSqlite().AddDbContext<TestPondContext>(options =>
+            //options.EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Singleton);
+
+            //Physical SQLite File - Scoped
+            //services.AddEntityFrameworkSqlite().AddDbContext<TestPondContext>(options =>
+            //options.EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Scoped);
         }
     }
 }

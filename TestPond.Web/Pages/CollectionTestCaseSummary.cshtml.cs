@@ -18,7 +18,7 @@ namespace TestPond.Web.Pages
         [BindProperty(SupportsGet = true)]
         public Guid Id { get; set; }
 
-        public DeviceTestSuiteCollectionRun CollectionRun{ get; set; }
+        public DeviceTestSuiteCollectionRun CollectionRun { get; set; }
 
         public IEnumerable<IGrouping<string, TestCase>> TestCaseExecutionsGroupedByClassName { get; set; }
 

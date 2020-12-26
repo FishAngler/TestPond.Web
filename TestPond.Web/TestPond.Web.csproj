@@ -377,5 +377,32 @@
     <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\TestFailure.cshtml.g.cs" />
     <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\_ViewImports.cshtml.g.cs" />
     <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\_ViewStart.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\NUnitXml.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\CollectionTestCaseSummary2.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\IndexOld.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Error.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Index.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Privacy.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\TestFailure.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Shared\_Layout.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\_ViewImports.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Shared\_ValidationScriptsPartial.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\SingleDeviceRun.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\_ViewStart.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Login.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\CollectionTestCaseSummary.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Admin\Index.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Index.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\CollectionTestCaseSummary.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\CollectionTestCaseSummary2.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\SingleDeviceRun.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\NUnitXml.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Shared\_ValidationScriptsPartial.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Privacy.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Shared\_Layout.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\Login.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\TestFailure.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\_ViewImports.cshtml.g.cs" />
+    <None Remove="obj\Debug\netcoreapp3.1\Razor\Pages\_ViewStart.cshtml.g.cs" />
   </ItemGroup>
 </Project>

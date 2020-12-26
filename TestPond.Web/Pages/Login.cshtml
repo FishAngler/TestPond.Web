@@ -1,0 +1,30 @@
+@page
+@model TestPond.Web.Pages.LoginModel
+@{ ViewData["Title"] = "Login"; }
+
+<h1>Login</h1>
+
+<div>
+    @Model.Message
+</div>
+<form method="post">
+    <div class="form-group">
+        <label asp-for="LoginUserName" class="col-form-label col-md-2"></label>
+        <div class="col-md-10">
+            <input asp-for="LoginUserName" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="LoginPassword" class="col-form-label col-md-2"></label>
+        <div class="col-md-10">
+            <input asp-for="LoginPassword" />
+        </div>
+    </div>
+    <div class="form-group">
+        <button class="btn btn-outline-primary btn-sm">Log in</button>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

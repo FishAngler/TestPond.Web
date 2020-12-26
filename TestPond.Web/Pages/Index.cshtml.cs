@@ -13,14 +13,14 @@ namespace TestPond.Web.Pages
     public class IndexRowModel : PageModel
     {
         private readonly CollectionRunService service;
-        private readonly ILogger<IndexModel> _logger;
+        private readonly ILogger<IndexRowModel> _logger;
 
         public IList<DeviceTestSuiteCollectionRun> collectionRuns;
 
         [BindProperty]
         public DeviceTestSuiteCollectionRun CollectionRun { get; set; }
 
-        public IndexRowModel(CollectionRunService service, ILogger<IndexModel> logger)
+        public IndexRowModel(CollectionRunService service, ILogger<IndexRowModel> logger)
         {
             this.service = service;
             _logger = logger;

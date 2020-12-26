@@ -82,6 +82,7 @@ namespace TestPond.BusinessLayer.Repositories
                 .Include(a => a.SingleDeviceTestSuiteRuns).ThenInclude(x => x.TestCaseExecutions)
                 .Include(a => a.SingleDeviceTestSuiteRuns).ThenInclude(x => x.MobileDevice)
                 .Where(x => !x.IsDeleted)
+                .AsSplitQuery()
                 .OrderByDescending(x => x.Date)
                 .ToListAsync();
 
@@ -217,6 +218,7 @@ namespace TestPond.BusinessLayer.Repositories
             var testExecutions = _ctx.DeviceTestSuiteCollectionRuns
                 .Include(x => x.SingleDeviceTestSuiteRuns).ThenInclude(x => x.TestCaseExecutions).ThenInclude(x => x.TestCase)
                 .Where(x => x.Id == id)
+                .AsSplitQuery()
                 .SingleOrDefault()
 
                 .SingleDeviceTestSuiteRuns

@@ -1,11 +1,12 @@
 using System.Globalization;
 using System.Reflection;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,9 +27,20 @@ namespace TestPond.Web
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(cookieOptions =>
+            {
+                cookieOptions.LoginPath = "/Login";
+            });
+
             /////// DATA
             string connStr = Configuration["ConnectionStrings:Default"];
 
@@ -50,7 +62,14 @@ namespace TestPond.Web
 
             ///// WEB
             services.AddControllers().AddNewtonsoftJson();
+
             services.AddRazorPages();
+
+            services.AddMvc().AddRazorPagesOptions(options =>
+            {
+                options.Conventions.AllowAnonymousToPage("/Login");
+                options.Conventions.AuthorizeFolder("/");
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             //Utilities
             services.AddTransient<IJsonService, JsonService>();
@@ -76,9 +95,12 @@ namespace TestPond.Web
             }
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
@@ -87,21 +109,6 @@ namespace TestPond.Web
                 endpoints.MapControllers();
                 endpoints.MapRazorPages();
             });
-        }
-
-        public void ConfigureWithSqlLite()
-        {
-            //In-Memory SQLite
-            //services.AddDbContext<TestPondContext>(options => options.UseInMemoryDatabase("TestPondDb")
-            //.EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Singleton);
-
-            //Physical SQLite File - Singleton
-            //services.AddEntityFrameworkSqlite().AddDbContext<TestPondContext>(options =>
-            //options.EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Singleton);
-
-            //Physical SQLite File - Scoped
-            //services.AddEntityFrameworkSqlite().AddDbContext<TestPondContext>(options =>
-            //options.EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Scoped);
         }
     }
 }

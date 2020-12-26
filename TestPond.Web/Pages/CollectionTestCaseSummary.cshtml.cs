@@ -10,10 +10,10 @@ using TestPond.BusinessLayer.Models;
 
 namespace TestPond.Web.Pages
 {
-    public class DeviceRunTestCaseSummaryModel : PageModel
+    public class CollectionTestCaseSummaryModel : PageModel
     {
         private CollectionRunService service;
-        private ILogger<DeviceRunTestCaseSummaryModel> _logger;
+        private ILogger<CollectionTestCaseSummaryModel> _logger;
 
         [BindProperty(SupportsGet = true)]
         public Guid Id { get; set; }
@@ -26,7 +26,7 @@ namespace TestPond.Web.Pages
         public int FailedCount { get; set; }
         public int SkippedCount { get; set; }
 
-        public DeviceRunTestCaseSummaryModel(CollectionRunService service, ILogger<DeviceRunTestCaseSummaryModel> logger)
+        public CollectionTestCaseSummaryModel(CollectionRunService service, ILogger<CollectionTestCaseSummaryModel> logger)
         {
             this.service = service;
             _logger = logger;
@@ -44,6 +44,16 @@ namespace TestPond.Web.Pages
             PassedCount = results.Count(x => x == TestResult.Passed);
             FailedCount = results.Count(x => x == TestResult.Failed);
             SkippedCount = results.Count(x => x == TestResult.Skipped);
+        }
+
+        public List<TestCaseExecution> GetPassingExecutions(TestCase tc)
+        {
+            return tc.TestCaseRuns.Where(x => x.Result == TestResult.Passed).ToList();
+        }
+
+        public List<TestCaseExecution> GetFailingExecutions(TestCase tc)
+        {
+            return tc.TestCaseRuns.Where(x => x.Result == TestResult.Failed).ToList();
         }
     }
 }

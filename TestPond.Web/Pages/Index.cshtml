@@ -18,7 +18,7 @@
         @foreach (var collectionRun in Model.collectionRuns)
         {
 
-        <tr onclick="window.location='/CollectionTestCaseSummary2?Id=@collectionRun.Id'">
+        <tr onclick="window.location='/CollectionTestCaseSummary?Id=@collectionRun.Id'">
             <td>@collectionRun.Date.ToLocalTime().ToShortDateString()<br />@collectionRun.Date.ToLocalTime().ToShortTimeString()</td>
             <th scope="row">@collectionRun.MobileAppBuild.BuildDefinitionName</th>
             <td>@collectionRun.MobileAppBuild.BuildNumber<br />@collectionRun.MobileAppBuild.BuildDate</td>

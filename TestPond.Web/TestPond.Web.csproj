@@ -9,6 +9,7 @@
     <Folder Include="API\" />
     <Folder Include="wwwroot\Uploads\" />
     <Folder Include="Utilities\" />
+    <Folder Include="Attributes\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TestPond.BusinessLayer\TestPond.BusinessLayer.csproj">

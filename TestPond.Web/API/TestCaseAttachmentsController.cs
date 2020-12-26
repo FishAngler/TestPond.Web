@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TestPond.BusinessLayer.Models.DTO;
 using TestPond.BusinessLayer.Services.CollectionRun;
+using TestPond.Web.Attributes;
 
 namespace TestPond.Web.API
 {
     [ApiController]
     [Route("api/[controller]")]
+    [ApiKey]
     public class TestCaseAttachmentsController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;

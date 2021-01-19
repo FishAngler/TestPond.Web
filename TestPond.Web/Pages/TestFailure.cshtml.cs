@@ -10,6 +10,7 @@ using TestPond.BusinessLayer.Models;
 using Microsoft.Extensions.Hosting;
 using System.IO;
 using TestPond.Web.Utilities;
+using Microsoft.Extensions.Configuration;
 
 namespace TestPond.Web.Pages
 {
@@ -25,17 +26,20 @@ namespace TestPond.Web.Pages
         public TestCaseExecution TestExecution{ get; set; }
 
         private readonly IHostEnvironment _env;
-        public string FailScreenshotDir { get; private set; }
+        private readonly IConfiguration _config;
+
+        //public string FailScreenshotDir { get; private set; }
 
         public string FailScreenshot { get; private set; }
 
         public string FormattedStackTrace{ get; private set; }
 
-        public TestFailureModel(CollectionRunService service, IHostEnvironment env, ILogger<TestFailureModel> logger)
+        public TestFailureModel(CollectionRunService service, IConfiguration config, IHostEnvironment env, ILogger<TestFailureModel> logger)
         {
             _service = service;
             _env = env;
             _logger = logger;
+            _config = config;
         }
 
         public async Task OnGet()
@@ -45,13 +49,17 @@ namespace TestPond.Web.Pages
             MobileAppBuild = TestExecution.SingleDeviceTestSuiteRun.DeviceTestSuiteCollectionRun.MobileAppBuild;
 
             //Test Failure Screenshots
-            var attachments = TestExecution.Attachments;
-            var screenshotAttachment = attachments?.Where(x => x.Description.Contains("Screenshot")).FirstOrDefault() ?? null;
+            var screenshotAttachment = TestExecution.Attachments?
+                .Where(x => x.Description.Contains("Screenshot"))
+                .FirstOrDefault() ?? null;
 
             if (screenshotAttachment != null)
             {
-                FailScreenshotDir = Url.Content("~/Uploads/Screenshots/");
-                FailScreenshot = Path.Combine(FailScreenshotDir, screenshotAttachment.FilePath);
+                var collRunId = TestExecution.SingleDeviceTestSuiteRun.DeviceTestSuiteCollectionRun.Id;
+                var singleDeviceRunId = TestExecution.SingleDeviceTestSuiteRun.Id;
+
+                FailScreenshot = Path.Combine(_config.GetValue<string>("BaseUrls:AzureBlobStorage"),
+                    "screenshots", collRunId.ToString(), singleDeviceRunId.ToString(), screenshotAttachment.FilePath);
             }
 
             //Test Failure Stack Trace
@@ -63,7 +71,6 @@ namespace TestPond.Web.Pages
 
         public string FormatStackTrace(string stackTraceText)
         {
-            
             if (string.IsNullOrWhiteSpace(stackTraceText))
             {
                 return string.Empty;

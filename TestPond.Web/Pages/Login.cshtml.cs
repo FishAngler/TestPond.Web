@@ -23,10 +23,10 @@ namespace TestPond.Web.Pages
         }
 
         [BindProperty]
-        public string LoginUserName { get; set; }
+        public string UserName { get; set; }
 
         [BindProperty, DataType(DataType.Password)]
-        public string LoginPassword { get; set; }
+        public string Password { get; set; }
 
         public string Message { get; set; }
 
@@ -34,28 +34,30 @@ namespace TestPond.Web.Pages
         {
             var registeredUsers = _configuration.GetSection("UserRoles").Get<List<UserRole>>();
 
-            //TODO: Handle "User not found"
-            var user = registeredUsers.Where(x => x.UserName == LoginUserName).Single();
+            UserRole user = null;
 
-            var passwordHasher = new PasswordHasher<string>();
+            user = registeredUsers.Where(x => x.UserName == UserName).FirstOrDefault();
 
-            //TODO: Handle "Password does not match"
-            if (passwordHasher.VerifyHashedPassword(null, user.HashedPassword, LoginPassword) == PasswordVerificationResult.Success)
+            if (user != null)
             {
-                var claims = new List<Claim>
+                var passwordHasher = new PasswordHasher<string>();
+
+                if (passwordHasher.VerifyHashedPassword(null, user.HashedPassword, Password) == PasswordVerificationResult.Success)
+                {
+                    var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.Name, LoginUserName)
+                        new Claim(ClaimTypes.Name, UserName)
                     };
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
-                //Admin Index Page is not displaying properly afte the user "should be signed in"...
-                return RedirectToPage("/Index");
+                    return RedirectToPage("/Index");
+                }
             }
 
-            Message = "Invalid attempt";
+            Message = "Username or Password was not valid";
 
             return Page();
         }

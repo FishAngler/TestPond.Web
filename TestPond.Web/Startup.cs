@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TestPond.BusinessLayer.Models;
 using TestPond.BusinessLayer.Repositories;
+using TestPond.BusinessLayer.Services;
 using TestPond.BusinessLayer.Services.CollectionRun;
 using TestPond.BusinessLayer.Services.NUnitDeserialization;
 using TestPond.WebAPI;
@@ -42,10 +43,10 @@ namespace TestPond.Web
             });
 
             /////// DATA
-            string connStr = Configuration["ConnectionStrings:Default"];
+            string sqlConnStr = Configuration["ConnectionStrings:SQLServer"];
 
             // DBContext
-            services.AddDbContext<TestPondContext>(options => options.UseSqlServer(connStr)
+            services.AddDbContext<TestPondContext>(options => options.UseSqlServer(sqlConnStr)
             .EnableSensitiveDataLogging().EnableDetailedErrors(), ServiceLifetime.Scoped);
 
             // Repository
@@ -59,6 +60,8 @@ namespace TestPond.Web
             services.AddScoped<CollectionRunService>();
             // NUnit
             services.AddTransient<INUnitXMLDeserializer, NUnitXMLDeserializer>();
+
+            services.AddSingleton<ScreenshotImageService>();
 
             ///// WEB
             services.AddControllers().AddNewtonsoftJson();

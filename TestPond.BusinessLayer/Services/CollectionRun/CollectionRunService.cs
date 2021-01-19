@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
 using AutoMapper;
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.Configuration;
 
 namespace TestPond.BusinessLayer.Services.CollectionRun
 {
@@ -26,15 +28,19 @@ namespace TestPond.BusinessLayer.Services.CollectionRun
         private readonly IHostEnvironment _env;
         private readonly TestPondRepository _repo;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _config;
+        private readonly ScreenshotImageService _imageStorage;
 
-        public CollectionRunService(TestPondRepository repo, INUnitXMLDeserializer deserializer, IMapper mapper,
-            IHostEnvironment env, ILogger<CollectionRunService> logger)
+        public CollectionRunService(IConfiguration config, TestPondRepository repo, INUnitXMLDeserializer deserializer, IMapper mapper,
+            IHostEnvironment env, ILogger<CollectionRunService> logger, ScreenshotImageService imageStorage)
         {
             _deserializer = deserializer;
             _repo = repo;
             _mapper = mapper;
             _env = env;
             _logger = logger;
+            _config = config;
+            _imageStorage = imageStorage;
         }
 
         #region MobileBuild
@@ -68,51 +74,54 @@ namespace TestPond.BusinessLayer.Services.CollectionRun
         #region TestCaseAttachments
         public async Task SaveTestCaseAttachments(IFormFileCollection screenshots)
         {
-            string screenshotsDir = Path.Combine(_env.ContentRootPath, "wwwroot", "Uploads", "Screenshots");
-            SaveFilesToDirectory(screenshots, screenshotsDir);
-            await AddAttachmentsToTestCaseExecutions(screenshots);
-        }
-
-        private async Task AddAttachmentsToTestCaseExecutions(IFormFileCollection screenshots)
-        {
-            var imgFilePathParts = screenshots.FirstOrDefault().FileName.Split("--");
-
-            var collRunId = Guid.Parse(imgFilePathParts.First());
-            var collRun = await GetCollectionRun(collRunId);
-
-            foreach (var img in screenshots)
-            {
-                var parts = img.FileName.Split("--");
-
-                var singleDeviceRunId = Guid.Parse(parts.ElementAt(1));
-                var testCaseName = parts.ElementAt(2).Replace(new FileInfo(img.FileName).Extension, "").Replace("-", ".");                
-
-                _repo.AddTestCaseAttachment(collRun, img.FileName, singleDeviceRunId, testCaseName);
-            }
-        }
-
-        private static void SaveFilesToDirectory(IFormFileCollection screenshots, string destinationDirectory)
-        {
-            if (!Directory.Exists(destinationDirectory))
-            {
-                Directory.CreateDirectory(destinationDirectory);
-            }
-
             if (screenshots.Count() > 0)
             {
                 foreach (var file in screenshots)
                 {
-                    //Will overwrite any existing file with the same FileName
-                    string newFile = Path.Combine(destinationDirectory, $"{file.FileName}");
-
-                    using (FileStream fs = File.Create(newFile))
-                    {
-                        file.CopyTo(fs);
-                        fs.Flush();
-                    }
+                    //TODO: Pass in "Folder Name" to Image Storage Service
+                    var screenshotInfo = GenerateScreenInfo(file);
+                    await _imageStorage.Save(screenshotInfo);
+                    await _repo.AddTestCaseAttachment(screenshotInfo);
                 }
             }
+
+            //await AddAttachmentsToTestCaseExecutions(screenshots);
         }
+
+        private Screenshot GenerateScreenInfo(IFormFile file)
+        {
+            var imgFilePathParts = file.FileName.Split("--");
+
+            ////Get Collection Run 
+            var collRunId = Guid.Parse(imgFilePathParts.First());
+
+            //var collRun = await GetCollectionRun(collRunId);
+
+            var singleDeviceRunId = Guid.Parse(imgFilePathParts.ElementAt(1));
+            var testCaseName = imgFilePathParts.ElementAt(2).Replace(new FileInfo(file.FileName).Extension, "").Replace("-", ".");
+
+            return new Screenshot()
+            {
+                CollectionRunId = collRunId,
+                SingleDeviceRunId = singleDeviceRunId,
+                TestCaseName = testCaseName,
+                File = file
+            };
+        }
+
+        private async Task<Screenshot> ParseAttachmentFileName(string collectionRunId, string filePath)
+        {
+            var parts = filePath.Split("--");
+
+            var singleDeviceRunId = Guid.Parse(parts.ElementAt(1));
+            var testCaseName = parts.ElementAt(2).Replace(new FileInfo(filePath).Extension, "").Replace("-", ".");
+
+            return new Screenshot()
+            {
+
+            };
+        }
+
         #endregion
 
         #region SingleDeviceRun
@@ -124,12 +133,7 @@ namespace TestPond.BusinessLayer.Services.CollectionRun
         #endregion
 
         #region TestCaseSummary
-        //public Task<IEnumerable<IGrouping<string, TestCaseExecution>>> GetTestCaseSummary(Guid id)
-        //{
-        //    var res = _repo.GetTestCaseSummary(id);
-        //    return res;
-        //}
-
+      
         public Task<IEnumerable<IGrouping<string, TestCase>>> GetTestCaseSummary(Guid id)
         {
             var res = _repo.GetTestCaseSummary(id);
@@ -263,6 +267,14 @@ namespace TestPond.BusinessLayer.Services.CollectionRun
 
             return destFilePath;
         }
+    }
+
+    public class Screenshot
+    {
+        public Guid CollectionRunId { get; set; }
+        public Guid SingleDeviceRunId { get; set; }
+        public string TestCaseName { get; set; }
+        public IFormFile File { get; set; }
     }
 }
 

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using TestPond.BusinessLayer.Models;
+using TestPond.BusinessLayer.Services.CollectionRun;
 
 namespace TestPond.BusinessLayer.Repositories
 {
@@ -23,7 +24,7 @@ namespace TestPond.BusinessLayer.Repositories
             //SEED Database (WRONG WAY)
             ctx.Database.EnsureCreated();
 
-            SeedDataIfEmpty();
+            //SeedDataIfEmpty();
 
             var testCases = ctx.TestCases.ToList();
             var collRuns = ctx.DeviceTestSuiteCollectionRuns.ToList();
@@ -217,8 +218,8 @@ namespace TestPond.BusinessLayer.Repositories
         {
             var testExecutions = _ctx.DeviceTestSuiteCollectionRuns
                 .Include(x => x.SingleDeviceTestSuiteRuns).ThenInclude(x => x.TestCaseExecutions).ThenInclude(x => x.TestCase)
-                .Where(x => x.Id == id)
                 .AsSplitQuery()
+                .Where(x => x.Id == id)
                 .SingleOrDefault()
 
                 .SingleDeviceTestSuiteRuns
@@ -254,14 +255,17 @@ namespace TestPond.BusinessLayer.Repositories
 
         #endregion
 
-        public void AddTestCaseAttachment(DeviceTestSuiteCollectionRun collRun, string fileName, Guid singleDeviceRunId, string testCaseName)
+        public async Task AddTestCaseAttachment(Screenshot screenshot)
         {
-            var matchingTestCaseExec = collRun.SingleDeviceTestSuiteRuns
-                                .Where(x => x.Id == singleDeviceRunId)
-                                .Single().TestCaseExecutions
-                                .Where(x => x.TestCase.Id == testCaseName).Single();
+            var collRun = await GetCollectionRun(screenshot.CollectionRunId);
 
-            var attachment = new TestCase_Attachment() { Description = "TestFailureScreenshot", FilePath = fileName };
+            var matchingTestCaseExec = collRun.SingleDeviceTestSuiteRuns
+                                .Where(x => x.Id == screenshot.SingleDeviceRunId)
+                                .Single()
+                                .TestCaseExecutions
+                                .Where(x => x.TestCase.Id == screenshot.TestCaseName).Single();
+
+            var attachment = new TestCase_Attachment() { Description = "TestFailureScreenshot", FilePath = screenshot.File.FileName };
 
             matchingTestCaseExec.Attachments.Add(attachment);
             _ctx.SaveChanges();

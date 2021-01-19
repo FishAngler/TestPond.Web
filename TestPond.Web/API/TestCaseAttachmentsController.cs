@@ -12,7 +12,7 @@ namespace TestPond.Web.API
 {
     [ApiController]
     [Route("api/[controller]")]
-    [ApiKey]
+    [ApiKeyRequired]
     public class TestCaseAttachmentsController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;

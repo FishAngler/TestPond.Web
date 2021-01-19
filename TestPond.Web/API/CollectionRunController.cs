@@ -12,7 +12,7 @@ namespace TestPond.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [ApiKey]
+    [ApiKeyRequired]
     public class CollectionRunController : Controller
     {
         private readonly CollectionRunService _collectionRunService;
@@ -38,6 +38,8 @@ namespace TestPond.WebAPI.Controllers
         public IActionResult Put([FromBody] NUnitXMLCollectionRunDTO dto)
         {
             _logger.LogInformation($"{nameof(CollectionRunController)}: Collection Run Received at {DateTime.Now.ToLocalTime()}!");
+
+            var headers = HttpContext.Request.Headers;
 
             _collectionRunService.AddCollectionRun(dto);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
@@ -8,37 +9,38 @@ using Microsoft.Extensions.DependencyInjection;
 namespace TestPond.Web.Attributes
 {
     [AttributeUsage(validOn: AttributeTargets.Class)]
-    public class ApiKeyAttribute : Attribute, IAsyncActionFilter
+    public class ApiKeyRequiredAttribute : Attribute, IAsyncActionFilter
     {
         private const string APIKEYNAME = "API_Key";
+        private const string APIKEYHASHNAME = "API_Key_Hash";
 
-        public ApiKeyAttribute()
+        public ApiKeyRequiredAttribute()
         {
         }
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (!context.HttpContext.Request.Headers.TryGetValue(APIKEYNAME, out var extractedApiKey))
+            if (!context.HttpContext.Request.Headers.TryGetValue(APIKEYNAME, out var clientProvidedAPIKey))
             {
                 context.Result = new ContentResult()
                 {
                     StatusCode = 401,
-                    Content =
-                    $"{APIKEYNAME} was not provided"
+                    Content =$"{APIKEYNAME} was not provided"
                 };
                 return;
             }
 
             var appSettings = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+            var storedAPIKeyHash = appSettings.GetValue<string>(APIKEYHASHNAME);
 
-            var apiKey = appSettings.GetValue<string>(APIKEYNAME);
+            var passwordHasher = new PasswordHasher<string>();
 
-            if (!apiKey.Equals(extractedApiKey))
+            if (passwordHasher.VerifyHashedPassword(null, storedAPIKeyHash, clientProvidedAPIKey) != PasswordVerificationResult.Success)
             {
                 context.Result = new ContentResult()
                 {
                     StatusCode = 401,
-                    Content = $"{APIKEYNAME} is not valid"
+                    Content = $"{APIKEYHASHNAME} is not valid"
                 };
                 return;
             }
